@@ -27,7 +27,7 @@ function cost(x)
     )
 
     return mean(data.infected_fraction)
-end</code></pre><pre class="documenter-example-output">cost (generic function with 1 method)</pre><p>This cost function runs our model 10 times for 50 days, then returns the average number of infected people. When we pass this function to an optimiser, we will effectively be asking for a set of parameters that can reduce the number of infected people to the lowest possible number.</p><p>We can now test the function cost with some reasonable parameter values.</p><pre><code class="language-">Random.seed!(10)
+end</code></pre><pre class="documenter-example-output">cost (generic function with 1 method)</pre><p>This cost function runs our model 10 times for 50 days, then returns the average number of infected people. When we pass this function to an optimiser, we will effectively be asking for a set of parameters that can reduce the number of infected people to the lowest possible number.</p><p>We can now test the function cost with some reasonable parameter values.</p><pre><code class="language-julia">Random.seed!(10)
 
 x0 = [
     0.2,  # migration_rate
@@ -38,7 +38,7 @@ x0 = [
     0.1,  # reinfection_probability
     5,    # detection_time
 ]
-cost(x0)</code></pre><p>With these initial values, 94% of the population is infected after the 50 day period.</p><p>We now let the optimization algorithm change parameters to minimize the number of infected individuals. Complete details on how to use this optimiser can be found in the <a href="https://github.com/robertfeldt/BlackBoxOptim.jl">BlackBoxOptim readme</a>. Here, we assign a range of possible parameter values we would like to test, and a cutoff time in the event that certain parameter sets are unfeasible and cause our model to never converge to a solution.</p><pre><code class="language-">result = bboptimize(
+cost(x0)</code></pre><pre class="documenter-example-output">0.9348851444455306</pre><p>With these initial values, 94% of the population is infected after the 50 day period.</p><p>We now let the optimization algorithm change parameters to minimize the number of infected individuals. Complete details on how to use this optimiser can be found in the <a href="https://github.com/robertfeldt/BlackBoxOptim.jl">BlackBoxOptim readme</a>. Here, we assign a range of possible parameter values we would like to test, and a cutoff time in the event that certain parameter sets are unfeasible and cause our model to never converge to a solution.</p><pre><code class="language-julia">result = bboptimize(
     cost,
     SearchRange = [
         (0.0, 1.0),
@@ -52,7 +52,14 @@ cost(x0)</code></pre><p>With these initial values, 94% of the population is infe
     NumDimensions = 7,
     MaxTime = 20,
 )
-best_fitness(result)</code></pre><p>With the new parameter values found in <code>result</code>, we find that the fraction of the infected population can be dropped down to 11%. These values of these parameters are now:</p><pre><code class="language-">best_candidate(result)</code></pre><p>Unfortunately we&#39;ve not given the optimiser information we probably needed to. Notice that the death rate is 96%, with reinfection quite low. When all the infected individuals die, infection doesn&#39;t transmit - the optimiser has managed to reduce the infection rate by killing the infected.</p><p>This is not the work of some sadistic AI, just an oversight in our instructions. Let&#39;s modify the cost function to also keep the mortality rate low.</p><p>First, we&#39;ll run the model with our new-found parameters:</p><pre><code class="language-">x = best_candidate(result)
+best_fitness(result)</code></pre><pre class="documenter-example-output">0.11400568097805301</pre><p>With the new parameter values found in <code>result</code>, we find that the fraction of the infected population can be dropped down to 11%. These values of these parameters are now:</p><pre><code class="language-julia">best_candidate(result)</code></pre><pre class="documenter-example-output">7-element Array{Float64,1}:
+  0.14295189314028073
+  0.9563511728519357
+  0.11642612651074881
+  0.1247861896135058
+ 12.633440015975424
+  0.0019240394102884694
+  3.8685012358501547</pre><p>Unfortunately we&#39;ve not given the optimiser information we probably needed to. Notice that the death rate is 96%, with reinfection quite low. When all the infected individuals die, infection doesn&#39;t transmit - the optimiser has managed to reduce the infection rate by killing the infected.</p><p>This is not the work of some sadistic AI, just an oversight in our instructions. Let&#39;s modify the cost function to also keep the mortality rate low.</p><p>First, we&#39;ll run the model with our new-found parameters:</p><pre><code class="language-julia">x = best_candidate(result)
 
 Random.seed!(0)
 
@@ -70,7 +77,7 @@ model = model_initiation(;
 _, data =
     run!(model, agent_step!, 50; mdata = [nagents], when_model = [50], replicates = 10)
 
-mean(data.nagents)</code></pre><p>About 10% of the population dies with these parameters over our 50 day window.</p><p>We can define a multi-objective cost function that minimizes the number of infected and deaths by returning more than one value in our cost function.</p><pre><code class="language-julia">function cost_multi(x)
+mean(data.nagents)</code></pre><pre class="documenter-example-output">1358.9</pre><p>About 10% of the population dies with these parameters over our 50 day window.</p><p>We can define a multi-objective cost function that minimizes the number of infected and deaths by returning more than one value in our cost function.</p><pre><code class="language-julia">function cost_multi(x)
     model = model_initiation(;
         Ns = [500, 500, 500],
         migration_rate = x[1],
@@ -98,7 +105,7 @@ mean(data.nagents)</code></pre><p>About 10% of the population dies with these pa
     )
 
     return mean(data.infected_fraction), mean(data.n_fraction)
-end</code></pre><pre class="documenter-example-output">cost_multi (generic function with 1 method)</pre><p>Notice that our new objective <code>n_fraction</code> is negative. It would be simpler to state we&#39;d like to &#39;maximise the living population&#39;, but the optimiser we&#39;re using here focuses on minimising objectives only, therefore we must &#39;minimise the number of agents dying&#39;.</p><pre><code class="language-">cost_multi(x0)</code></pre><p>The cost of our initial parameter values is high: most of the population (96%) is infected and 22% die.</p><p>Let&#39;s minimize this multi-objective cost function. There is more than one way to approach such an optimisation. Again, refer to the <a href="https://github.com/robertfeldt/BlackBoxOptim.jl">BlackBoxOptim readme</a> for specifics.</p><pre><code class="language-">result = bboptimize(
+end</code></pre><pre class="documenter-example-output">cost_multi (generic function with 1 method)</pre><p>Notice that our new objective <code>n_fraction</code> is negative. It would be simpler to state we&#39;d like to &#39;maximise the living population&#39;, but the optimiser we&#39;re using here focuses on minimising objectives only, therefore we must &#39;minimise the number of agents dying&#39;.</p><pre><code class="language-julia">cost_multi(x0)</code></pre><pre class="documenter-example-output">(0.9613671038668243, -0.7817999999999999)</pre><p>The cost of our initial parameter values is high: most of the population (96%) is infected and 22% die.</p><p>Let&#39;s minimize this multi-objective cost function. There is more than one way to approach such an optimisation. Again, refer to the <a href="https://github.com/robertfeldt/BlackBoxOptim.jl">BlackBoxOptim readme</a> for specifics.</p><pre><code class="language-julia">result = bboptimize(
     cost_multi,
     Method = :borg_moea,
     FitnessScheme = ParetoFitnessScheme{2}(is_minimizing = true),
@@ -114,6 +121,13 @@ end</code></pre><pre class="documenter-example-output">cost_multi (generic funct
     NumDimensions = 7,
     MaxTime = 55,
 )
-best_fitness(result)</code></pre><pre><code class="language-">best_candidate(result)</code></pre><p>These parameters look better: about 0.3% of the population dies and 0.02% are infected:</p><p>The algorithm managed to minimize the number of infected and deaths while still increasing death rate to 42%, reinfection probability to 53%, and migration rates to 33%. The most important change however, was decreasing the transmission rate when individuals are infected and undetected from 30% in our initial calculation, to 0.2%.</p><p>Over a longer period of time than 50 days, that high death rate will take its toll though. Let&#39;s reduce that rate and check the cost.</p><pre><code class="language-">x = best_candidate(result)
+best_fitness(result)</code></pre><pre class="documenter-example-output">(0.0002010274938093588, -0.9970666666666664)</pre><pre><code class="language-julia">best_candidate(result)</code></pre><pre class="documenter-example-output">7-element Array{Float64,1}:
+ 0.33047213757587385
+ 0.4162200712338514
+ 0.19614410158370602
+ 0.001988769978834718
+ 7.602018447426495
+ 0.5364418966125286
+ 4.025083782376916</pre><p>These parameters look better: about 0.3% of the population dies and 0.02% are infected:</p><p>The algorithm managed to minimize the number of infected and deaths while still increasing death rate to 42%, reinfection probability to 53%, and migration rates to 33%. The most important change however, was decreasing the transmission rate when individuals are infected and undetected from 30% in our initial calculation, to 0.2%.</p><p>Over a longer period of time than 50 days, that high death rate will take its toll though. Let&#39;s reduce that rate and check the cost.</p><pre><code class="language-julia">x = best_candidate(result)
 x[2] = 0.02
-cost_multi(x)</code></pre><p>The fraction of infected increases to 0.04%. This is an interesting result: since this virus model is not as deadly, the chances of re-infection increase. We now have a set of parameters to strive towards in the real world. Insights such as these assist us to enact countermeasures like social distancing to mitigate infection risks.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../diffeq/">« DifferentialEquations.jl</a><a class="docs-footer-nextpage" href="../../mesa/">Comparison against Mesa (Python) »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Sunday 20 September 2020 23:44">Sunday 20 September 2020</span>. Using Julia version 1.5.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+cost_multi(x)</code></pre><pre class="documenter-example-output">(0.00046675567423230975, -0.9996666666666666)</pre><p>The fraction of infected increases to 0.04%. This is an interesting result: since this virus model is not as deadly, the chances of re-infection increase. We now have a set of parameters to strive towards in the real world. Insights such as these assist us to enact countermeasures like social distancing to mitigate infection risks.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../diffeq/">« DifferentialEquations.jl</a><a class="docs-footer-nextpage" href="../../mesa/">Comparison against Mesa (Python) »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 22 September 2020 14:05">Tuesday 22 September 2020</span>. Using Julia version 1.5.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
