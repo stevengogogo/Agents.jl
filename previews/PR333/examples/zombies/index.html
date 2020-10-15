@@ -26,14 +26,24 @@ end</code></pre><p>The model constructor we build consists of a map, and 100 age
     patient_zero = random_agent(model)
     patient_zero.infected = true
     return model
-end</code></pre><pre class="documenter-example-output">initialise (generic function with 1 method)</pre><p>In our model, agents are seemingly oblivious to the problem, they keep going about their business, but start eating people along the way. Perhaps they can finally express their distaste for city commuting.</p><pre><code class="language-">function agent_step!(agent, model)</code></pre><p>Each agent will progress 25 meters along their route</p><pre><code class="language-">    move_agent!(agent, model, 25)
+end</code></pre><pre class="documenter-example-output">initialise (generic function with 1 method)</pre><p>In our model, agents are seemingly oblivious to the problem, they keep going about their business, but start eating people along the way. Perhaps they can finally express their distaste for city commuting.</p><pre><code class="language-julia">function agent_step!(agent, model)
+    # Each agent will progress 25 meters along their route
+    move_agent!(agent, model, 25)
 
-    if agent.pos[1] == agent.pos[2] &amp;&amp; length(agent.route) == 0 &amp;&amp; rand() &lt; 0.1</code></pre><p>When stationary, give the agent a 10% chance of going somwhere else</p><pre><code class="language-">        agent.route = plan_route(agent.pos[1], random_position(model)[1], model)</code></pre><p>Drop current position</p><pre><code class="language-">        popfirst!(agent.route)</code></pre><p>Start on new route</p><pre><code class="language-">        move_agent!(agent, OSMPos(agent.pos[1], popfirst!(agent.route)), model)
+    if agent.pos[1] == agent.pos[2] &amp;&amp; length(agent.route) == 0 &amp;&amp; rand() &lt; 0.1
+        # When stationary, give the agent a 10% chance of going somwhere else
+        agent.route = plan_route(agent.pos[1], random_position(model)[1], model)
+        # Drop current position
+        popfirst!(agent.route)
+        # Start on new route
+        move_agent!(agent, OSMPos(agent.pos[1], popfirst!(agent.route)), model)
     end
 
-    if agent.infected</code></pre><p>Agents will be infected if they get within 50 meters of a zombie.</p><pre><code class="language-">        map(i -&gt; model[i].infected = true, nearby_ids(agent, model, 50))
+    if agent.infected
+        # Agents will be infected if they get within 50 meters of a zombie.
+        map(i -&gt; model[i].infected = true, nearby_ids(agent, model, 50))
     end
-end</code></pre><h2 id="Visualising-the-fall-of-humanity"><a class="docs-heading-anchor" href="#Visualising-the-fall-of-humanity">Visualising the fall of humanity</a><a id="Visualising-the-fall-of-humanity-1"></a><a class="docs-heading-anchor-permalink" href="#Visualising-the-fall-of-humanity" title="Permalink"></a></h2><p>Plotting this space in a seemless manner is a work in progress. For now we use <a href="https://github.com/pszufe/OpenStreetMapXPlot.jl">OpenStreetMapXPlot</a> and a custom routine.</p><pre><code class="language-julia">using OpenStreetMapXPlot
+end</code></pre><pre class="documenter-example-output">agent_step! (generic function with 1 method)</pre><h2 id="Visualising-the-fall-of-humanity"><a class="docs-heading-anchor" href="#Visualising-the-fall-of-humanity">Visualising the fall of humanity</a><a id="Visualising-the-fall-of-humanity-1"></a><a class="docs-heading-anchor-permalink" href="#Visualising-the-fall-of-humanity" title="Permalink"></a></h2><p>Plotting this space in a seemless manner is a work in progress. For now we use <a href="https://github.com/pszufe/OpenStreetMapXPlot.jl">OpenStreetMapXPlot</a> and a custom routine.</p><pre><code class="language-julia">using OpenStreetMapXPlot
 using Plots
 gr()
 
@@ -67,4 +77,4 @@ frames = @animate for i in 0:200
     plotagents(model)
 end
 
-gif(frames, &quot;outbreak.gif&quot;, fps = 15)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../opinion_spread/">« Opinion spread</a><a class="docs-footer-nextpage" href="../../models/">Predefined Models »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Thursday 15 October 2020 09:45">Thursday 15 October 2020</span>. Using Julia version 1.5.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+gif(frames, &quot;outbreak.gif&quot;, fps = 15)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../opinion_spread/">« Opinion spread</a><a class="docs-footer-nextpage" href="../../models/">Predefined Models »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Thursday 15 October 2020 10:24">Thursday 15 October 2020</span>. Using Julia version 1.5.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
