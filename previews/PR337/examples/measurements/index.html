@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Measurements.jl · Agents.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="https://fonts.googleapis.com/css?family=Montserrat|Source+Code+Pro&amp;display=swap" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.png" alt="Agents.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit">Agents.jl</span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Introduction</a></li><li><a class="tocitem" href="../../tutorial/">Tutorial</a></li><li><input class="collapse-toggle" id="menuitem-3" type="checkbox"/><label class="tocitem" for="menuitem-3"><span class="docs-label">Examples</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../schelling/">Schelling&#39;s segregation model</a></li><li><a class="tocitem" href="../sugarscape/">Sugarscape</a></li><li><a class="tocitem" href="../sir/">SIR model for the spread of COVID-19</a></li><li><a class="tocitem" href="../social_distancing/">Continuous space social distancing for COVID-19</a></li><li><a class="tocitem" href="../wealth_distribution/">Wealth distribution</a></li><li><a class="tocitem" href="../forest_fire/">Forest fire</a></li><li><a class="tocitem" href="../game_of_life_2D_CA/">Conway&#39;s game of life</a></li><li><a class="tocitem" href="../wright-fisher/">Wright-Fisher model of evolution</a></li><li><a class="tocitem" href="../hk/">Hegselmann-Krause opinion dynamics</a></li><li><a class="tocitem" href="../flock/">Flocking</a></li><li><a class="tocitem" href="../daisyworld/">Daisyworld</a></li><li><a class="tocitem" href="../predator_prey/">Predator-Prey</a></li><li><a class="tocitem" href="../growing_bacteria/">Bacteria Growth</a></li><li><a class="tocitem" href="../opinion_spread/">Opinion spread</a></li></ul></li><li><a class="tocitem" href="../../models/">Predefined Models</a></li><li><a class="tocitem" href="../../api/">API</a></li><li><a class="tocitem" href="../../interact/">Interactive application</a></li><li><input class="collapse-toggle" id="menuitem-7" type="checkbox" checked/><label class="tocitem" for="menuitem-7"><span class="docs-label">Ecosystem Integration</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../optim/">BlackBoxOptim.jl</a></li><li><a class="tocitem" href="../diffeq/">DifferentialEquations.jl</a></li><li><a class="tocitem" href="../schoolyard/">LightGraphs.jl</a></li><li class="is-active"><a class="tocitem" href>Measurements.jl</a><ul class="internal"><li><a class="tocitem" href="#Setup"><span>Setup</span></a></li><li><a class="tocitem" href="#Adding-Uncertainty"><span>Adding Uncertainty</span></a></li><li><a class="tocitem" href="#Visualizing-the-Result"><span>Visualizing the Result</span></a></li></ul></li></ul></li><li><a class="tocitem" href="../../comparison/">ABM Framework Comparison</a></li><li><a class="tocitem" href="../../devdocs/">Developer Docs</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Ecosystem Integration</a></li><li class="is-active"><a href>Measurements.jl</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Measurements.jl</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/JuliaDynamics/Agents.jl/blob/master/examples/measurements.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Providing-uncertainty-with-Measurements.jl"><a class="docs-heading-anchor" href="#Providing-uncertainty-with-Measurements.jl">Providing uncertainty with Measurements.jl</a><a id="Providing-uncertainty-with-Measurements.jl-1"></a><a class="docs-heading-anchor-permalink" href="#Providing-uncertainty-with-Measurements.jl" title="Permalink"></a></h1><p><a href="https://github.com/JuliaPhysics/Measurements.jl">Measurements.jl</a> provides automatic error propagation, and integrates seamlessly with much of the Julia ecosystem.</p><p>Here, we&#39;ll slightly modify the <a href="../daisyworld/#Daisyworld">Daisyworld</a> example, to simulate some measurement uncertainty in our world&#39;s parameters.</p><h2 id="Setup"><a class="docs-heading-anchor" href="#Setup">Setup</a><a id="Setup-1"></a><a class="docs-heading-anchor-permalink" href="#Setup" title="Permalink"></a></h2><p>First we&#39;ll construct our agents.</p><pre><code class="language-julia">using Agents
+using Measurements
+
+mutable struct Daisy &lt;: AbstractAgent
+    id::Int
+    pos::Tuple{Int,Int}
+    breed::Symbol
+    age::Int
+    albedo::AbstractFloat # Allow Measurements
+end
+
+mutable struct Land &lt;: AbstractAgent
+    id::Int
+    pos::Tuple{Int,Int}
+    temperature::AbstractFloat # Allow Measurements
+end</code></pre><p>Notice that there is only one small difference between this version and the original example model: the use of <code>AbstractFloat</code> instead of <code>Float64</code> for the <code>albedo</code> and <code>temperature</code> parameters. Behaviour between these two types is practically equivalent from our perspective, but it allows us to use an uncertain value for our two parameters. <code>1.0 ± 0.1</code> rather than <code>1.0</code> for example. We could also be specific here and bind the parameters with type <code>Measurement{Float64}</code> as well.</p><p>Next, we&#39;ll implement all the important functions for DaisyWorld. If you want to know what each of these functions do, see the <a href="../daisyworld/#Daisyworld">Daisyworld</a> example, as they are copied directly from there.</p><pre><code class="language-julia">using Plots
+using Statistics: mean
+import DrWatson: @dict
+import StatsBase
+
+const DaisyWorld = ABM{Union{Daisy,Land}}
+
+function update_surface_temperature!(pos::Tuple{Int,Int}, model::DaisyWorld)
+    ids = ids_in_position(pos, model)
+    absorbed_luminosity = if length(ids) == 1
+        (1 - model.surface_albedo) * model.solar_luminosity
+    else
+        (1 - model[ids[2]].albedo) * model.solar_luminosity
+    end
+    local_heating = absorbed_luminosity &gt; 0 ? 72 * log(absorbed_luminosity) + 80 : 80
+    T0 = model[ids[1]].temperature
+    model[ids[1]].temperature = (T0 + local_heating) / 2
+end
+
+function diffuse_temperature!(pos::Tuple{Int,Int}, model::DaisyWorld)
+    ratio = get(model.properties, :ratio, 0.5)
+    ids = nearby_ids(pos, model)
+    meantemp = sum(model[i].temperature for i in ids if model[i] isa Land) / 8
+    land = model[ids_in_position(pos, model)[1]]
+    land.temperature = (1 - ratio) * land.temperature + ratio * meantemp
+end
+
+function propagate!(pos::Tuple{Int,Int}, model::DaisyWorld)
+    ids = ids_in_position(pos, model)
+    if length(ids) &gt; 1
+        daisy = model[ids[2]]
+        temperature = model[ids[1]].temperature
+        seed_threshold = (0.1457 * temperature - 0.0032 * temperature^2) - 0.6443
+        if rand() &lt; seed_threshold
+            empty_neighbors = Tuple{Int,Int}[]
+            neighbors = nearby_positions(pos, model)
+            for n in neighbors
+                if length(ids_in_position(n, model)) == 1
+                    push!(empty_neighbors, n)
+                end
+            end
+            if !isempty(empty_neighbors)
+                seeding_place = rand(empty_neighbors)
+                a = Daisy(nextid(model), seeding_place, daisy.breed, 0, daisy.albedo)
+                add_agent_pos!(a, model)
+            end
+        end
+    end
+end
+
+function agent_step!(agent::Daisy, model::DaisyWorld)
+    agent.age += 1
+    agent.age &gt;= model.max_age &amp;&amp; kill_agent!(agent, model)
+end
+
+agent_step!(agent::Land, model::DaisyWorld) = nothing
+
+function model_step!(model)
+    for p in positions(model)
+        update_surface_temperature!(p, model)
+        diffuse_temperature!(p, model)
+        propagate!(p, model)
+    end
+    model.tick += 1
+    solar_activity!(model)
+end
+
+function solar_activity!(model::DaisyWorld)
+    if model.scenario == :ramp
+        if model.tick &gt; 200 &amp;&amp; model.tick &lt;= 400
+            model.solar_luminosity += model.solar_change
+        end
+        if model.tick &gt; 500 &amp;&amp; model.tick &lt;= 750
+            model.solar_luminosity -= model.solar_change / 2
+        end
+    elseif model.scenario == :change
+        model.solar_luminosity += model.solar_change
+    end
+end</code></pre><pre class="documenter-example-output">solar_activity! (generic function with 1 method)</pre><h2 id="Adding-Uncertainty"><a class="docs-heading-anchor" href="#Adding-Uncertainty">Adding Uncertainty</a><a id="Adding-Uncertainty-1"></a><a class="docs-heading-anchor-permalink" href="#Adding-Uncertainty" title="Permalink"></a></h2><p>Now, we can write a constructor function, and use uncertainly values which will propagate automatically through our model.</p><pre><code class="language-julia">function daisyworld(;
+    griddims = (30, 30),
+    max_age = 25,
+    init_white = 0.2,
+    init_black = 0.2,
+    albedo_white = 0.75,
+    albedo_black = 0.25,
+    # Surface albedo measurements are complicated for our satellites perhaps
+    surface_albedo = 0.4 ± 0.15,
+    # Measurements from the sun are generally stable, but fluctuate around 10%
+    solar_change = 0.005 ± 0.002,
+    solar_luminosity = 1.0 ± 0.1,
+    scenario = :default,
+)
+
+    space = GridSpace(griddims)
+    properties = @dict max_age surface_albedo solar_luminosity solar_change scenario
+    properties[:tick] = 0
+    daisysched(model) = [a.id for a in allagents(model) if a isa Daisy]
+    model = ABM(
+        Union{Daisy,Land},
+        space;
+        scheduler = daisysched,
+        properties = properties,
+        warn = false,
+    )
+
+    # An uncertain initial temperature, solely for type stability
+    fill_space!(Land, model, 0.0 ± 0.0)
+    grid = collect(positions(model))
+    num_positions = prod(griddims)
+    white_positions =
+        StatsBase.sample(grid, Int(init_white * num_positions); replace = false)
+    for wp in white_positions
+        wd = Daisy(nextid(model), wp, :white, rand(0:max_age), albedo_white)
+        add_agent_pos!(wd, model)
+    end
+    allowed = setdiff(grid, white_positions)
+    black_positions =
+        StatsBase.sample(allowed, Int(init_black * num_positions); replace = false)
+    for bp in black_positions
+        wd = Daisy(nextid(model), bp, :black, rand(0:max_age), albedo_black)
+        add_agent_pos!(wd, model)
+    end
+
+    return model
+end</code></pre><pre class="documenter-example-output">daisyworld (generic function with 1 method)</pre><p>You see we&#39;ve included uncertainty in four places: surface albedo and initial temperature, and the two solar luminosity values. We do not require changes to any model code, nor handle these parameters in any special way; for example <code>2.0 * surface_albedo</code> is a regular operation. Errors will be propagated under the hood automatically.</p><h2 id="Visualizing-the-Result"><a class="docs-heading-anchor" href="#Visualizing-the-Result">Visualizing the Result</a><a id="Visualizing-the-Result-1"></a><a class="docs-heading-anchor-permalink" href="#Visualizing-the-Result" title="Permalink"></a></h2><p>Similar to the <a href="../daisyworld/#Daisyworld">Daisyworld</a> example, we will now check out how the surface temperature and daisy count fares when solar luminosity ramps up.</p><p>First, some helper functions</p><pre><code class="language-julia">black(y) = count(x -&gt; x == :black, y)
+white(y) = count(x -&gt; x == :white, y)
+breed(a) = a isa Daisy ? a.breed : :land
+
+gettemperature(a) = a.temperature
+island(a) = a isa Land
+adata = [(breed, black), (breed, white), (gettemperature, mean, island)]
+mdata = [:solar_luminosity]</code></pre><pre class="documenter-example-output">1-element Array{Symbol,1}:
+ :solar_luminosity</pre><p>And now the simulation</p><pre><code class="language-">Random.seed!(19) # hide
+model = daisyworld(scenario = :ramp)
+agent_df, model_df =
+    run!(model, agent_step!, model_step!, 1000; adata = adata, mdata = mdata)
+
+p1 = plot(agent_df.step, agent_df.black_breed, label = &quot;black&quot;, ylabel = &quot;Daisy count&quot;)
+plot!(p1, agent_df.step, agent_df.white_breed, label = &quot;white&quot;)
+
+p2 = plot(
+    agent_df.step,
+    Measurements.value.(agent_df[!, aggname(adata[3])]),
+    ribbon = Measurements.uncertainty.(agent_df[!, aggname(adata[3])]),
+    ylabel = &quot;Temperature&quot;,
+    legend = false,
+)
+
+p3 = plot(
+    model_df.step,
+    Measurements.value.(model_df.solar_luminosity),
+    ribbon = Measurements.uncertainty.(model_df.solar_luminosity),
+    ylabel = &quot;Luminosity&quot;,
+    xlabel = &quot;Years&quot;,
+    legend = false,
+)
+
+plot(p1, p2, p3, layout = (3, 1), size = (600, 700))</code></pre><p><a href="https://github.com/JuliaPlots/Plots.jl">Plots.jl</a> automatically adds error bars onto series that have <code>Measurement{Float64}</code> types. However, we use <code>ribbon</code>s above to display the uncertainty since we have so many points. Notice that the error has automatically propagated throughout the model.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../schoolyard/">« LightGraphs.jl</a><a class="docs-footer-nextpage" href="../../comparison/">ABM Framework Comparison »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 3 November 2020 15:48">Tuesday 3 November 2020</span>. Using Julia version 1.5.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
